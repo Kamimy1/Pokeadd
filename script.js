@@ -61,12 +61,14 @@ function loadGeneration(genNumber) {
       pokemonsCapturados = data;
     }
 
-    // Obtener especies
+    // Carga de las generaciones
     Promise.all(
       gensToLoad.map(num => fetch(generationEndpoints[num]).then(res => res.json()))
     ).then(async generations => {
+      // Obtener todos los Pokémon de las generaciones
       const allSpecies = generations.flatMap(g => g.pokemon_species);
 
+      // Ordenar por ID
       allSpecies.sort((a, b) => {
         const idA = parseInt(a.url.split('/')[6]);
         const idB = parseInt(b.url.split('/')[6]);
@@ -75,6 +77,7 @@ function loadGeneration(genNumber) {
 
       const pokemons = [];
 
+      // Obtener datos de cada Pokémon
       for (let species of allSpecies) {
         try {
           const res = await fetch(`https://pokeapi.co/api/v2/pokemon/${species.name}`);
@@ -86,8 +89,9 @@ function loadGeneration(genNumber) {
           console.warn("Error con " + species.name);
         }
       }
-      // Filtrar por tipo
+
       container.innerHTML = '';
+      // Crear tarjetas de Pokémon
       pokemons.forEach(pokemon => {
         const card = document.createElement('div');
         card.className = 'pokemon-card';
